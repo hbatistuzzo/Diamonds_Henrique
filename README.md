@@ -30,6 +30,8 @@ This ReadMe is divided into 2 main sections:
 
 # $\color{goldenrod}{\textrm{1 - Machine Learning and Linear Regression Theory}}$
 
+As with other showcase projects, I add my personal notes on how I tackle the subject. Far from didactic, they're simply here to show that I actually did the legwork.
+
 In regression analysis, groups of variables can be correlated to a single target, or outcome. The relationships between these variables can be used to predict the future values of that outcome. We call the variables that are correlated with the outcome `independent` X variables, and the outcome variable the `dependent` Y variable. 
 
 Regression analysis is one of the most common techniques used to make predictions. Depending on the question we would like to answer, and the format of the outcome variable, regression analysis can be used to both make value predictions (what will my income be next year?) and classifications (based on the qualities of a song, will I like it or not?). The relationship between the X variables and the Y variables can also take different formats. The case that an increase or decrease in an X variable always produces the same, fixed increase or decrease in the Y variable is called linear regression. When this relationship is not always the same we classify it as non-linear regression. 
@@ -180,7 +182,7 @@ The p-value tests the null hypothesis that there is no correlation between X and
 std_err is the standard error of the slope, which measures the precision of the slope estimate. It quantifies how much the slope would vary if you repeatedly sampled from the population and performed the regression each time. A smaller standard error indicates that the slope estimate is more precise.
 With a value of 0.0019, the slope estimate of b1 = 0.0555 is very precise, which suggests the relationship between TV ads and sales is robust.
 
-So the verdict is in, specifically in this linear regression predictive scenario, `scipy.stats.linregress` is a more handy tool than sk-learn, which really shines on other sorts of ML cases.
+So the verdict is in, specifically in this linear regression predictive scenario, `scipy.stats.linregress` is a more handy tool than sk-learn, which really shines on other sorts of ML cases. The __biggest caveat__ to consider is that scipy doesn't handle performance well with big datasets, so that's something to keep in mind.
 
 <br>
 <br>
