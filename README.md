@@ -12,7 +12,7 @@
 <div style="text-align: justify;">
 This project is based on a [somewhat classic kaggle dataset from 2016](https://www.kaggle.com/datasets/shivam2503/diamonds) used to explain introductory level machine learning.  
 
-Given a [historic dataset](/data_files/diamonds.csv) with over 54,000 diamond prices and their characteristics, we are tasked by our client (Rick Harrison from _Pawn Stars_) to estimate the price of [his own list](/data_files/rick_diamonds.csv) of 5,000 diamonds, thus setting up a classic regression problem. Specifically, the goals are:
+Given a [historic dataset](/data/diamonds.csv) with over 54,000 diamond prices and their characteristics, we are tasked by our client (Rick Harrison from _Pawn Stars_) to estimate the price of [his own list](/data/rick_diamonds.csv) of 5,000 diamonds, thus setting up a classic regression problem. Specifically, the goals are:
 </div>
 
 <br>
@@ -22,7 +22,75 @@ Given a [historic dataset](/data_files/diamonds.csv) with over 54,000 diamond pr
 
 <p align="center"><img src="images/challenge_objectives.png" alt="full"  width="60%"></p>
 
----
+This ReadMe is divided into 2 main sections:
+1) the first focusing on the theory behind Linear Regression and Machine Learning,
+2) and the second dealing with the project itself.
+
+<br>
+
+# $\color{goldenrod}{\textrm{1 - Machine Learning and Linear Regression Theory}}$
+
+In regression analysis, groups of variables can be correlated to a single target, or outcome. The relationships between these variables can be used to predict the future values of that outcome. We call the variables that are correlated with the outcome `independent` X variables, and the outcome variable the `dependent` Y variable. 
+
+Regression analysis is one of the most common techniques used to make predictions. Depending on the question we would like to answer, and the format of the outcome variable, regression analysis can be used to both make value predictions (what will my income be next year?) and classifications (based on the qualities of a song, will I like it or not?). The relationship between the X variables and the Y variables can also take different formats. The case that an increase or decrease in an X variable always produces the same, fixed increase or decrease in the Y variable is called linear regression. When this relationship is not always the same we classify it as non-linear regression. 
+
+In some cases, there is only one predictor variable, which makes the relation a simple (univariate) linear regression. In other cases, there are more than one predictor variables which is called multiple (multivariate) linear regression, as is the case in the project below.
+
+- Univariate analysis, or simple linear regression, is when only one X (independent) variable is used to predict the outcome variable. In the case of linear univariate analysis, we can model this relationship using a straight line.
+
+- Multivariate analysis is when multiple variables all work together to explain the outcome variable. For instance, using the data above, let’s say we still want to predict the number of minutes a person is awake during the night. We think that this outcome could be determined by multiple factors in addition to the number of times a person wakes up during the night: the minutes of sleep they get overall, and their daytime activity level (maybe people who are more active are likely to sleep more).
+
+[This ipynb](linear-regression-part1.ipynb) uses [this data file](/data/advertising.csv) to exemplify the use of seaborn/matplotlib tolls such as regplot and pairplot below, to visualize and study regression cases.
+
+<div style="display: flex; justify-content: space-around; align-items: center;">
+    <img src="images/regplot_tv.png" alt="alt text" width="33%" style="display: block; margin: auto;" />
+    <img src="images/regplot_news.png" alt="alt text" width="33%" style="display: block; margin: auto;" />
+    <img src="images/regplot_radio.png" alt="alt text" width="33%" style="display: block; margin: auto;" />
+</div>
+
+<br>
+
+<img src="images/pairplot_test.png" alt="alt text" width="75%" style="display: block; margin: auto;" />
+
+<br>
+
+Tools such as these make it easier to provide inferences regarding the nature of the relationships between the different variables in the dataset. There is clearly a higher correlation between TV adverts and sales, than with the Newspaper and Radio counterparts.
+
+In quantitative terms, we could use pandas.corr to output Pearson correlation coefficients and reach this conclution:
+
+|          | TV        | Radio     | Newspaper | Sales     |
+|----------|-----------|-----------|-----------|-----------|
+| **TV**   | 1.000000  | 0.054809  | 0.056648  | 0.901208  |
+| **Radio**| 0.054809  | 1.000000  | 0.354104  | 0.349631  |
+| **Newspaper** | 0.056648  | 0.354104  | 1.000000  | 0.157960  |
+| **Sales**| 0.901208  | 0.349631  | 0.157960  | 1.000000  |
+
+Heatmaps are useful in these scenarios to make the most critical relationships pop out:
+
+```
+# Generate a mask for the upper triangle
+mask = np.zeros_like(corr, dtype=np.bool)
+mask[np.triu_indices_from(mask)] = True
+
+# Set up the matplotlib figure
+f, ax = plt.subplots(figsize=(11, 9))
+
+# Draw the heatmap with the mask and correct aspect ratio
+sns.heatmap(corr, mask=mask, cmap='Greens', vmin=.0, center=0,
+            square=True, linewidths=.5, cbar_kws={"shrink": .5}, annot=True)
+```
+
+<img src="images/sales_heatmap.png" alt="alt text" width="75%" style="display: block; margin: auto;" />
+
+<br>
+
+This is all swell and good, but if we need a tangible equation to express the linear regression, scikit comes in handy. With this toll we can also explicitly quantify the distance between the data points and the regression line, giving a measure of dispersion. 
+
+
+
+
+
+# $\color{goldenrod}{\textrm{2 - The Project}}$
 
 ## Technologies
 
