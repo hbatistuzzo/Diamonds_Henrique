@@ -43,14 +43,14 @@ In some cases, there is only one predictor variable, which makes the relation a 
 [This ipynb](linear-regression-part1.ipynb) uses [this data file](/data/advertising.csv) to exemplify the use of seaborn/matplotlib tolls such as regplot and pairplot below, to visualize and study regression cases.
 
 <div style="display: flex; justify-content: space-around; align-items: center;">
-    <img src="images/regplot_tv.png" alt="alt text" width="33%" style="display: block; margin: auto;" />
+    <img src="images/regplot_TV.png" alt="alt text" width="33%" style="display: block; margin: auto;" />
     <img src="images/regplot_news.png" alt="alt text" width="33%" style="display: block; margin: auto;" />
     <img src="images/regplot_radio.png" alt="alt text" width="33%" style="display: block; margin: auto;" />
 </div>
 
 <br>
 
-<img src="images/pairplot_test.png" alt="alt text" width="75%" style="display: block; margin: auto;" />
+<p align="center"><img src="images/pairplot_test.png" alt="alt text" width="75%" style="display: block; margin: auto;" /></p>
 
 <br>
 
@@ -80,14 +80,69 @@ sns.heatmap(corr, mask=mask, cmap='Greens', vmin=.0, center=0,
             square=True, linewidths=.5, cbar_kws={"shrink": .5}, annot=True)
 ```
 
-<img src="images/sales_heatmap.png" alt="alt text" width="75%" style="display: block; margin: auto;" />
+<p align="center"><img src="images/sales_heatmap.png" alt="alt text" width="75%" style="display: block; margin: auto;" /></p>
 
 <br>
 
-This is all swell and good, but if we need a tangible equation to express the linear regression, scikit comes in handy. With this toll we can also explicitly quantify the distance between the data points and the regression line, giving a measure of dispersion. 
+This is all swell and good, but if we need a tangible equation to express the linear regression, `scikit-learn` comes in handy. With this tool we can also explicitly quantify the distance between the data points and the regression line, giving a measure of dispersion.
+
+- We separate our variables:
+    - X: predictive variables - or explicative variables (should be a **pandas dataframe or n-D numpy array**)
+    - y: the variable you want to predict - or target (should be a **pandas series or 1-D numpy array**)
+
+In this case, say we want to predict `y = sales`  given the value I invest in `X = TV` advertising.
+
+- `model.fit(X, y)` is the most important step in our linear regression. It will train our model. Specifically, it will calculate the values of the **intercept** and the **coefficients**.
+
+- After training our model, wecan use the method `model.predict(X)` to obtain a predicted value of `Sales` given a value of `TV`. Say we want to know the value our model predicts for `TV = 100`. We have to pass a dataframe like the one we've used to `train` our model. We can also predict several values at once, or even the whole dataset. The process is described in the code below:
 
 
+```
+from sklearn.linear_model import LinearRegression
+model = LinearRegression()
 
+X = df[['TV']]
+y = df['Sales']
+
+model.fit(X,y)
+
+data_to_predict = pd.DataFrame([200], columns=['TV'])
+data_to_predict
+
+model.predict(data_to_predict)
+
+multiple_data_to_predict = pd.DataFrame([100, 150, 200, 250, 300, 350, 400, 450], columns=['TV'])
+multiple_data_to_predict
+
+model.predict(multiple_data_to_predict)
+
+y_pred = model.predict(X)
+y_pred
+
+X_all = X
+y_predicted_all = model.predict(X_all)
+```
+
+We can then visualize the results with matplotlib, for example
+```
+plt.figure(figsize=(8,6))
+plt.xlabel('TV')
+plt.ylabel('Sales')
+plt.scatter(X, y, color='red', label='observed')
+
+# plot the predicted values together with the observed values
+plt.scatter(X_all, y_predicted_all, label='predicted')
+
+
+plt.legend();
+```
+
+<p align="center"><img src="images/predicted_add.png" alt="alt text" width="75%" style="display: block; margin: auto;" /></p>
+
+
+<br>
+<br>
+<br>
 
 
 # $\color{goldenrod}{\textrm{2 - The Project}}$
