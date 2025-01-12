@@ -84,17 +84,17 @@ sns.heatmap(corr, mask=mask, cmap='Greens', vmin=.0, center=0,
 
 <br>
 
-This is all swell and good, but if we need a tangible equation to express the linear regression, `scikit-learn` comes in handy. With this tool we can also explicitly quantify the distance between the data points and the regression line, giving a measure of dispersion.
+This is all swell and good, but since there is a clear linear relationship between the variables, we could try implementing a predictive analysis on this dataset. This is where the `scikit-learn` library comes in handy. 
 
 - We separate our variables:
     - X: predictive variables - or explicative variables (should be a **pandas dataframe or n-D numpy array**)
     - y: the variable you want to predict - or target (should be a **pandas series or 1-D numpy array**)
 
-In this case, say we want to predict `y = sales`  given the value I invest in `X = TV` advertising.
+In this case, say we want to predict `y = sales`  given the value I invest in `X = TV` advertising. This is an example of **supervised learning** / **supervised machine learning**, since the model is trained on labeled data, where the input (features) and output (target) are known.
 
 - `model.fit(X, y)` is the most important step in our linear regression. It will train our model. Specifically, it will calculate the values of the **intercept** and the **coefficients**.
 
-- After training our model, wecan use the method `model.predict(X)` to obtain a predicted value of `Sales` given a value of `TV`. Say we want to know the value our model predicts for `TV = 100`. We have to pass a dataframe like the one we've used to `train` our model. We can also predict several values at once, or even the whole dataset. The process is described in the code below:
+- After training our model, we can use the method `model.predict(X)` to obtain a predicted value of `Sales` given a value of `TV`. Say we want to know the value our model predicts for `TV = 100`. We have to pass a dataframe like the one we've used to `train` our model. We can also predict several values at once, or even the whole dataset. The process is described in the code below:
 
 
 ```
@@ -106,19 +106,14 @@ y = df['Sales']
 
 model.fit(X,y)
 
-data_to_predict = pd.DataFrame([200], columns=['TV'])
-data_to_predict
-
+data_to_predict = pd.DataFrame([100], columns=['TV'])
 model.predict(data_to_predict)
 
+####
 multiple_data_to_predict = pd.DataFrame([100, 150, 200, 250, 300, 350, 400, 450], columns=['TV'])
-multiple_data_to_predict
-
 model.predict(multiple_data_to_predict)
-
-y_pred = model.predict(X)
-y_pred
-
+####
+qw 
 X_all = X
 y_predicted_all = model.predict(X_all)
 ```
@@ -139,11 +134,58 @@ plt.legend();
 
 <p align="center"><img src="images/predicted_add.png" alt="alt text" width="75%" style="display: block; margin: auto;" /></p>
 
+<br>
+
+This works quite well in this scenario because the relationship is clearly linear. We can now use either the `scikit-learn` or the `scipy` library to explicitly provides us with measures of the slope, intercept, r_value, value and std_err of the linear fit:
+
+```
+from sklearn.linear_model import LinearRegression
+model = LinearRegression()
+model.fit(X,y)
+
+print ('The slope is: ' , str(model.coef_[0]))
+print ('The intercept is: ' , str(model.intercept_))
+```
+
+This yields a slope of 0.055464770469558874' and an intercept of 6.974821488229891 i.e. <b> if I change 1 unit of investment in TV, i gain ~0.055 units of Sales </b>; also, <b> the value of sales for which TV equals 0 is ~6.97 </b>
+
+```
+# with scipy:
+from scipy import stats
+X = df['TV']
+y = df['Sales']
+slope, intercept, r_value, p_value, std_err = stats.linregress(X, y_pred)
+
+print('The slope is: ' + str(slope))
+print('The intercept is: '+ str(intercept))
+print('The r_value is: ' + str(r_value))
+print('The p_value is: '+ str(p_value))
+print('The std_err is: ' + str(std_err))
+```
+
+>__Warning__ Scipy takes 2 dataframes, instead of an 1-D array in the target as sk-learn does, so mind this detail.
+
+This yields _very slightly_ different values (beyond the 10th decimal) due to the internal workings of the libraries themselves. Scipy, beingn a strong stats tool, also provides us automatically with some more relevant info:
+
+```
+The r_value is: 0.9012079133023304
+The p_value is: 7.92791162532341e-74
+The std_err is: 0.001895551178040245
+```
+
+The r_value is the Pearson coefficient coefficient which we derived earlier from `pandas.corr`, which measures the strength and direction of the linear relationship between X (tv adds) and y (sales). An r-value of 0.9012 indicates a strong positive linear relationship between tv adds and sales. This means higher spending on TV ads is generally associated with higher sales.
+
+The p-value tests the null hypothesis that there is no correlation between X and y. A very small p-value (close to 0) indicates that the observed correlation is highly unlikely to have occurred by chance. With a p-value of 7.93×10^(−74), the evidence strongly rejects the null hypothesis. The correlation between TV ads and sales is statistically significant.
+
+std_err is the standard error of the slope, which measures the precision of the slope estimate. It quantifies how much the slope would vary if you repeatedly sampled from the population and performed the regression each time. A smaller standard error indicates that the slope estimate is more precise.
+With a value of 0.0019, the slope estimate of b1 = 0.0555 is very precise, which suggests the relationship between TV ads and sales is robust.
+
+So the verdict is in, specifically in this linear regression predictive scenario, `scipy.stats.linregress` is a more handy tool than sk-learn, which really shines on other sorts of ML cases.
 
 <br>
 <br>
-<br>
 
+![Abhinandan Trilokia](https://raw.githubusercontent.com/Trilokia/Trilokia/379277808c61ef204768a61bbc5d25bc7798ccf1/bottom_header.svg)
 
 # $\color{goldenrod}{\textrm{2 - The Project}}$
 
@@ -656,3 +698,5 @@ We will now create masks for clarity and color to optimize the modelling process
 	"- to progressively train and test a regression model until its accuracy meet a certain standard (defined by the RMSE). Rick’s goal is to obtain an average error below 900 dollars."
 
 - Rick is now a richer man and we have proved the usefulness of machine learning! 🥳 🥂 🍾
+
+![Abhinandan Trilokia](https://raw.githubusercontent.com/Trilokia/Trilokia/379277808c61ef204768a61bbc5d25bc7798ccf1/bottom_header.svg)
