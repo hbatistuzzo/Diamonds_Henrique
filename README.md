@@ -52,9 +52,9 @@ In some cases, there is only one predictor variable, which makes the relation a 
 [This ipynb](linear-regression-part1.ipynb) uses [this data file](/data/advertising.csv) to exemplify the use of seaborn/matplotlib tolls such as regplot and pairplot below, to visualize and study regression cases.
 
 <div style="display: flex; justify-content: space-around; align-items: center;">
-    <img src="images/regplot_TV.png" alt="alt text" width="33%" style="display: block; margin: auto;" />
-    <img src="images/regplot_news.png" alt="alt text" width="33%" style="display: block; margin: auto;" />
-    <img src="images/regplot_radio.png" alt="alt text" width="33%" style="display: block; margin: auto;" />
+    <img src="images/regplot_TV.png" alt="alt text" width="30%" style="display: block; margin: auto;" />
+    <img src="images/regplot_news.png" alt="alt text" width="30%" style="display: block; margin: auto;" />
+    <img src="images/regplot_radio.png" alt="alt text" width="30%" style="display: block; margin: auto;" />
 </div>
 
 <br>
