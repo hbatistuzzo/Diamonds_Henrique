@@ -7,28 +7,35 @@
 
 ## Project objective
 
-<img src="images/diamonds.jpg" align="right" width="40%" style="margin-left: 20px;"/>
+<img src="images/diamonds.jpg" align="right" width="35%" style="margin-left: 20px;"/>
 
 <div style="text-align: justify;">
+
 This project is based on a [somewhat classic kaggle dataset from 2016](https://www.kaggle.com/datasets/shivam2503/diamonds) used to explain introductory level machine learning.  
 
 Given a [historic dataset](/data/diamonds.csv) with over 54,000 diamond prices and their characteristics, we are tasked by our client (Rick Harrison from _Pawn Stars_) to estimate the price of [his own list](/data/rick_diamonds.csv) of 5,000 diamonds, thus setting up a classic regression problem. Specifically, the goals are:
 </div>
 
-<br>
-
 - to infer which characteristics are more likely to influence a diamond's price;
 - to progressively train and test a regression model until its accuracy meet a certain standard (defined by the RMSE). Rick’s goal is to obtain an average error below 900 dollars.
 
+<br>
+
 <p align="center"><img src="images/challenge_objectives.png" alt="full"  width="60%"></p>
 
+---
+<br>
+
 This ReadMe is divided into 2 main sections:
-1) the first focusing on the theory behind Linear Regression and Machine Learning,
-2) and the second dealing with the project itself.
+
+- the first focusing on the theory behind Linear Regression and Machine Learning,
+- and the second dealing with the project itself.
 
 <br>
 
 # $\color{goldenrod}{\textrm{1 - Machine Learning and Linear Regression Theory}}$
+
+## $\color{goldenrod}{\textrm{1.1 - Simple Linear Reggresion (Univariate Analysis)}}$
 
 As with other showcase projects, I add my personal notes on how I tackle the subject. Far from didactic, they're simply here to show that I actually did the legwork.
 
@@ -149,7 +156,7 @@ print ('The slope is: ' , str(model.coef_[0]))
 print ('The intercept is: ' , str(model.intercept_))
 ```
 
-This yields a slope of 0.055464770469558874' and an intercept of 6.974821488229891 i.e. <b> if I change 1 unit of investment in TV, i gain ~0.055 units of Sales </b>; also, <b> the value of sales for which TV equals 0 is ~6.97 </b>
+This yields a slope of 0.055464770469558874' and an intercept of 6.974821488229891 i.e. <b> if I change 1 unit of investment in TV, i gain ~0.055 units of Sales</b>; also, <b> the value of sales for which TV equals 0 is ~6.97. </b>
 
 ```
 # with scipy:
@@ -167,7 +174,7 @@ print('The std_err is: ' + str(std_err))
 
 >__Warning__ Scipy takes 2 dataframes, instead of an 1-D array in the target as sk-learn does, so mind this detail.
 
-This yields _very slightly_ different values (beyond the 10th decimal) due to the internal workings of the libraries themselves. Scipy, beingn a strong stats tool, also provides us automatically with some more relevant info:
+This yields _very slightly_ different values (beyond the 10th decimal) due to the internal workings of the libraries themselves. Scipy, being a strong stats tool, also provides us automatically with some more relevant info:
 
 ```
 The r_value is: 0.9012079133023304
@@ -184,7 +191,83 @@ With a value of 0.0019, the slope estimate of b1 = 0.0555 is very precise, which
 
 So the verdict is in, specifically in this linear regression predictive scenario, `scipy.stats.linregress` is a more handy tool than sk-learn, which really shines on other sorts of ML cases. The __biggest caveat__ to consider is that scipy doesn't handle performance well with big datasets, so that's something to keep in mind.
 
+---
+
 <br>
+
+## $\color{goldenrod}{\textrm{1.2 - Multiple Linear Reggresion (Multivariate Analysis)}}$
+
+We just explored how to predict an outcome using just one X variable. Now, let’s consider the case where we have multiple variables that all work together to explain the outcome variable i.e. Y is still the same, but we have added additional X’s to our equation. We will use additional columns from the dataset to include as the predictor variables (hence multiple linear regression)
+
+>__TIP__  - **Hypothesis Testing in Multiple Regression**: T-statistics for coefficient is used to check if the coefficient is statistically significant. This acts as an important tool to check if the predictor variable associated with the coefficient is to be included in the model or not. More on that later.
+
+>__WARNING__ - Also.. Let's consider the possibility that the relationship between an X variable and the Y variable might not br linear. In this case, we have to add non-linearities to the mathematical model that we use. More on that later too.
+
+Now we know how to predict a value for the outcome variable based on some data about the X variables. But how do we know that the line we have chosen to fit and represent our data is an accurate or inaccurate representation of the true relationship between the variables?
+
+An important concept for understanding how well a line ‘fits’ is the **residuals**.
+
+First, we know that our model has made some predictions for the value of Y. These are ‘fitted values’ and they lie on the line that we have drawn through our data. We can calculate these values like this:
+
+predictions = [intercept + slope*x for x in X]
+
+Let’s imagine that we save some of our Y values to compare to those Y values that our model predicts. The residual is the difference between the original value and the predicted value (error of the prediction). In Python, we can calculate the residuals like this:
+
+`residuals = [Y[i] - predictions[i] for i in range(len(Y))]`
+
+So how do we draw this line most accurately?
+
+- The **`Least Squares Estimation`**, commonly known as **OLS (Ordinary Least Squares)**, finds the best line that fits the data such that the sum of the squared errors/residuals is minimized. The theory is that the ideal straight line we draw should have the minimal total distances (errors) from all the data points. But because the residual values can be negative, we use the squared errors (squaring ensures that all the resulting values are positive). It is helpful to imagine this method as drawing a line that seems like it fits the data well, comparing the original value and the predicted value to obtain the residual, and then repeatedly re-drawing and adjusting the line so the total of all the residuals for all of the points is as small as possible.  It is important to note that this method is computationally inexpensive, _but sensitive to outliers_.  
+
+- the **`RMSE (Root Mean Squared Error)`** is a measure of the overall accuracy of the model. It is the square root of the average squared error (or residual). To calculate RMSE in Python:
+
+```
+import numpy as np
+RMSE = np.sqrt(np.mean([residual**2 for residual in residuals]))
+```
+
+Given it is based off the errors in the Y variable, the RMSE has the same units as the outcome variable. Lower values mean that variation in the data that the model does not explain is low, indicating a better fit.
+
+- **`R squared`**`: This is another important statistic used to measure the accuracy of the model. It ranges from 0 to 1 and it measures the proportion of variation in the data that the model is able to capture. Usually the larger the value of R square, better is the model. But this is not always true (stay tuned).
+
+```
+from sklearn.metrics import mean_squared_error, r2_score
+print(mean_squared_error(Y, predictions))
+r2_score(Y, predictions)
+```
+
+As we have seen, Linear Regression is a very useful model. However, it has some limitations, and therefore is best used in specific situations. These limitations come from the assumptions that the model makes about the relationships between variables in the data:
+
+1) Relationship between the outcomes and the predictors is linear;
+2) Errors are uncorrelated;
+3) Errors are normally distributed with mean 0 and constant variance;
+
+To check these assumptions we use residual analysis plots such as QQ plot / Quantile Plots, normal probability plots of the residuals, plots of the residuals vs fitted values.
+
+**A note for the future**: I've tried asking CGPT for a fluxogram that organized the appropriate use of uni/multivariate analysis, considering "checks" such as the 3 ones discussed above. It proudly stated that it could create one. This is the result (it used DALL-E, as I discovered soon after. Which explains a lot):
+
+
+<p align="center"><img src="images/ohno.png" alt="alt text" width="75%" style="display: block; margin: auto;" /></p>
+
+<br>
+
+Seems like we still got some ways to go in this field. <br>
+Alright, let's jump back to our advertisament exmaple. Let's stick with sklearn instead of scipy for now. In a nutshell, the model was created with:
+
+```
+from sklearn.linear_model import LinearRegression
+
+X = df[['TV']]
+y = df['Sales']
+
+model = LinearRegression()
+model.fit(X, y)
+
+print('slope is ' + str(model.coef_))
+print('Intercept is ' + str(model.intercept_))
+```
+
+
 <br>
 
 ![Abhinandan Trilokia](https://raw.githubusercontent.com/Trilokia/Trilokia/379277808c61ef204768a61bbc5d25bc7798ccf1/bottom_header.svg)
