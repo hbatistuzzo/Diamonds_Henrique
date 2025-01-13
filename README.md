@@ -128,6 +128,7 @@ y_predicted_all = model.predict(X_all)
 ```
 
 We can then visualize the results with matplotlib, for example
+
 ```
 plt.figure(figsize=(8,6))
 plt.xlabel('TV')
@@ -191,6 +192,17 @@ With a value of 0.0019, the slope estimate of b1 = 0.0555 is very precise, which
 
 So the verdict is in, specifically in this linear regression predictive scenario, `scipy.stats.linregress` is a more handy tool than sk-learn, which really shines on other sorts of ML cases. The __biggest caveat__ to consider is that scipy doesn't handle performance well with big datasets, so that's something to keep in mind.
 
+<div align='center' style="font-size: 24px" > <b> Conclusion </b> </div>
+
+<br>
+The whole purpose of regression is to <b>find a curve that best fits the data points</b>, from whence 2 main applications pop out:
+
+- Description: Use <b> regression </b> to determine the strength of the relationship between the target variable you are interested in and the other variables. 
+
+- Prediction: Use <b> regression </b> to predict values of new data points. 
+
+Concerning **Degrees of freedom**: A regression line is one of the simplest models. We say it has <b>2 degrees of freedom</b>. Namely, the slope and the intercept.
+
 ---
 
 <br>
@@ -244,7 +256,7 @@ As we have seen, Linear Regression is a very useful model. However, it has some 
 
 To check these assumptions we use residual analysis plots such as QQ plot / Quantile Plots, normal probability plots of the residuals, plots of the residuals vs fitted values.
 
-**A note for the future**: I've tried asking CGPT for a fluxogram that organized the appropriate use of uni/multivariate analysis, considering "checks" such as the 3 ones discussed above. It proudly stated that it could create one. This is the result (it used DALL-E, as I discovered soon after. Which explains a lot):
+**A note for the future**: I've tried asking CGPT for a fluxogram that organized the appropriate use of uni/multivariate analysis, considering "checks" such as the 3 ones discussed above. It proudly stated that it could create one. This is the result (it used DALL-E, as I discovered soon after, which explains a lot):
 
 
 <p align="center"><img src="images/ohno.png" alt="alt text" width="75%" style="display: block; margin: auto;" /></p>
@@ -252,7 +264,7 @@ To check these assumptions we use residual analysis plots such as QQ plot / Quan
 <br>
 
 Seems like we still got some ways to go in this field. <br>
-Alright, let's jump back to our advertisament exmaple. Let's stick with sklearn instead of scipy for now. In a nutshell, the model was created with:
+Alright, let's jump back to our advertisement example. Let's stick with sklearn instead of scipy for now. To recap, the model was created with:
 
 ```
 from sklearn.linear_model import LinearRegression
@@ -267,8 +279,119 @@ print('slope is ' + str(model.coef_))
 print('Intercept is ' + str(model.intercept_))
 ```
 
+which yields our regression:
+
+<p align="center"><img src="https://raw.githubusercontent.com/Rairocha/images/main/lin_reg.png" alt="alt text" width="75%" style="display: block; margin: auto;" /></p>
 
 <br>
+
+Let's recap the conclusions and then dive further into the theory.<br>
+
+1. **r_value (Correlation Coefficient)**: represents the strength and direction of the linear relationship between the independent variable (tv adds) and the dependent variable (sales). Interpretation: Values close to 1 or -1 indicate a strong linear relationship. A positive value (0.9012) means a strong positive correlation; as tv adds increase, sales tend to increase.
+The high value here confirms that tv adds is a strong predictor of sales.
+
+2. **p_value**: tests the null hypothesis that the slope of the regression line is zero (no relationship between tv adds and sales). Interpretation: A small p_value (usually < 0.05) indicates that we can reject the null hypothesis, meaning there is a statistically significant relationship. Here, the extremely small p-value (7.93e-74) strongly supports the significance of the relationship between tv adds and sales.
+
+3. **std_err (Standard Error of the Slope)**: quantifies the uncertainty (or variability) of the estimated slope. Interpretation: A smaller std_err indicates more precise estimates of the slope. In our case, the very low value (0.0019) suggests that the slope estimate (0.0555) is highly reliable.
+
+4. **MSE (Mean Squared Error)**: measures the average squared difference between the observed values (sales) and the values predicted by the model. Interpretation: Lower MSE indicates that the model's predictions are closer to the actual values. An MSE of 5.2177 means that, on average, the squared errors (differences) between the predicted and actual sales values are 5.2177. This value gives you a sense of the model's accuracy in absolute terms, but it's also useful to compare with other models or metrics. The RMSE (root of MSE) of 2.28 indicates that, on average, the model's predictions for sales deviate from the actual values by approximately 2.28 units. The RMSE reflects the average error _magnitude_, not the average error itself (which would be the Mean Absolute Error, MAE).
+```
+from sklearn.metrics import mean_squared_error
+mean_squared_error(y_observed, y_predicted)
+
+### yields MSE = 5.2177; but since this is a quadractic value, np.sqrt(mean_squared_error(y_observed, y_predicted)) = 2.28 (the RMSE) is a more meaningful metric: 
+```
+
+5. **R-squared (Coefficient of Determination)**: measures the proportion of variance in the dependent variable (sales) that is explained by the independent variable (tv adds). Interpretation: Values range from 0 to 1. An R-squared of 0.8121 means that about 81.21% of the variance in sales can be explained by the tv adds variable. This indicates a strong explanatory power for the model, aligning with the high correlation coefficient (r_value).
+```
+from sklearn.metrics import r2_score
+r2_score(y_observed, y_predicted)
+
+# or alternatively use
+model.score(X, y)
+
+yields a $R^2$ of 0.8121; $R^2$ is a measure of how much information of our Y-variable is explained by our X-variable.
+```
+
+<br>
+We should keep in mind that because the linear regression works in optimizing the intercept and slope coefficient such that it minimizes the error (i.e. it tries to the **mean** error as small as possible), it is greatly affected by Outliers. A cleaning pre-step might come in handy depending on the dataset.
+
+---
+
+Let's add a second predictor, effectively performing a Multiple Linear Regression: $$y = a_0 + a_1 x_1 + a_2 x_2 + ... + a_n x_n$$
+
+<p align="center"><img src="https://raw.githubusercontent.com/Rairocha/images/main/mult_lin_reg.png" alt="alt text" width="75%" style="display: block; margin: auto;" /></p>
+
+With sklearn, this is as simple as passing a dataframe with the 2 predictive variables as X:
+```
+X = df[['TV','Radio']]
+y = df['Sales']
+
+model.fit(X,y)
+
+print(model.coef_)
+print(model.intercept_)
+```
+
+This yields a model.coef_ = array([0.05444896, 0.10717457]) and a model.intercept_  = 4.6308. Let's think about this:
+
+Coefficients (model.coef_ = [0.05444896, 0.10717457])
+
+These values represent the slope of the regression line for each predictor:
+- TV coefficient (0.0544): For every additional unit spent on TV advertising, Sales are expected to increase by 0.0544 units, holding Radio constant.
+- Radio coefficient (0.1072): For every additional unit spent on Radio advertising, Sales are expected to increase by 0.1072 units, holding TV constant.
+
+Intercept (model.intercept_ = 4.6309): This is the expected value of Sales when both TV and Radio spending are zero. It provides a baseline for predictions when no advertising is done.
+
+**The larger coefficient for Radio suggests that it has a stronger effect on Sales per unit of investment compared to TV.**: this happens _even though TV has a much higher correlation with Sales than Radio_.
+
+Also, in the univariate model, TV was the sole predictor, and the slope was 0.0555. Now, with the multivariate model, the TV coefficient is slightly reduced to 0.0544, which suggests that part of the effect previously attributed to TV alone may now be explained by Radio.
+
+In the multivariate analysis, the RMSE is 1.645; before, it was 2.28. This suggests that the addition of the Radio predictor has improved the model's performance. The RMSE improvement can be expressed as a percentage: `((2.28 - 1.645) / 2.28) X 100 = 27.8%` i.e. adding Radio as a predictor reduced the average prediction error by approximately 27.8%
+
+What about the $R^2$?
+
+```
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score
+
+# Fit the model
+model = LinearRegression()
+X = df[['TV', 'Radio']]
+y = df['Sales']
+model.fit(X, y)
+
+# Generate predictions
+y_pred = model.predict(X)
+
+# Calculate R-squared
+r2 = r2_score(y, y_pred)
+
+# Print the result
+print(f"R-squared: {r2:.4f}")
+```
+
+yields $R^2$ = 0.9026. Before, it was 0.8121, which indicates that the multivariate model explains significantly more variance in Sales compared to the univariate model.
+
+__"yeah right" - you say - "but this could be due to overfitting__
+
+Which is true, but there are ways to inspect this, such as calculating the adjusted $R^2$, which accounts for the number of predictors in the model and penalizes the inclusion of variables that don’t contribute much explanatory power:
+
+```
+n = len(y)  # Number of observations
+p = X.shape[1]  # Number of predictors
+adjusted_r2 = 1 - (1 - r2) * (n - 1) / (n - p - 1)
+print(f"Adjusted R-squared: {adjusted_r2:.4f}")
+```
+
+this yields an Adjusted R-squared of 0.9016. Compared to the previous $R^2$ of 0.9026, this indicates only a minor adjustment after accounting for the number of predictors. This is a positive sign, as it suggests the additional predictor (Radio) contributes meaningful information to the model without overfitting! If the Adjusted $R^2$ had dropped significantly, it would suggest that Radio was unnecessary or introducing noise.
+
+There are other ways to account for overfitting, such as `Train-Test Splitting`, `Cross-Validation` and `Residual Analysis`. More on that later!
+
+---
+
+Now we must touch on the subject of **Standardization**, which utilizes the _Z-score_. To standardize a variables, wetransform it into a variable that has **mean = 0** and **standard deviation = 1**. In this manner, all variables are scaled to the same scale!
+
 
 ![Abhinandan Trilokia](https://raw.githubusercontent.com/Trilokia/Trilokia/379277808c61ef204768a61bbc5d25bc7798ccf1/bottom_header.svg)
 
